@@ -1,7 +1,6 @@
 package fizz
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -43,7 +42,7 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		context := NewContext(w, req)
 		handler(context)
 	} else {
-		fmt.Fprintf(w, "%v 404 NOT FOUND with error %v", req.URL, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

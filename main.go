@@ -2,20 +2,32 @@ package main
 
 import (
 	ginFizz "fizz"
-	"fmt"
 	"net/http"
 )
 
 func main() {
 	r := ginFizz.New()
-	r.GET("/", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(w, "URL.Path = %q\n", req.URL.Path)
+	r.GET("/", func(c *ginFizz.Context) {
+		c.HTML(http.StatusOK, "<h1>Hello</h1>")
 	})
 
-	r.GET("/hello", func(w http.ResponseWriter, req *http.Request) {
-		for k, v := range req.Header {
-			fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
+	r.GET("/string", func(c *ginFizz.Context) {
+		c.String(http.StatusOK, "URL.Path = %q\n", c.Path)
+	})
+
+	r.GET("/json", func(c *ginFizz.Context) {
+		res := ginFizz.H{}
+		for k, v := range c.Request.Header {
+			res[k] = v
 		}
+		c.JSON(http.StatusOK, &res)
+	})
+
+	r.POST("/form", func(c *ginFizz.Context) {
+		c.JSON(http.StatusOK, &ginFizz.H{
+			"username": c.FormValue("username"),
+			"password": c.FormValue("password"),
+		})
 	})
 
 	r.Run(":9999")

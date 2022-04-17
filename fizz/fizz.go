@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-// HandlerFunc is http.HandlerFunc
-type HandlerFunc http.HandlerFunc
+// HandlerFunc is customized based on http.HandlerFunc
+type HandlerFunc func(c *Context)
 
 // Engine stores router info, etc.(TBD)
 type Engine struct {
@@ -40,7 +40,8 @@ func (engine *Engine) POST(path string, handler HandlerFunc) {
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	pattern := req.Method + "-" + req.URL.Path
 	if handler, err := engine.router.GetRoute(pattern); err == nil {
-		handler(w, req)
+		context := NewContext(w, req)
+		handler(context)
 	} else {
 		fmt.Fprintf(w, "%v 404 NOT FOUND with error %v", req.URL, err)
 	}

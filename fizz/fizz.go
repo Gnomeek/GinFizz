@@ -20,8 +20,7 @@ func New() *Engine {
 // addRoute register handler into route,
 // the key is concat by method, slash, and path as the key while handler as value
 func (engine *Engine) addRoute(method string, path string, handler HandlerFunc) {
-	pattern := method + "-" + path
-	engine.router.AddRoute(pattern, handler)
+	engine.router.AddRoute(method, path, handler)
 }
 
 // GET defines HTTP GET method
@@ -37,8 +36,7 @@ func (engine *Engine) POST(path string, handler HandlerFunc) {
 // ServeHTTP is implemented from http.Handler interface
 // so that engine can be used in http.ListenAndServe
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	pattern := req.Method + "-" + req.URL.Path
-	if handler, err := engine.router.GetRoute(pattern); err == nil {
+	if handler, err := engine.router.GetRoute(req); err == nil {
 		context := NewContext(w, req)
 		handler(context)
 	} else {

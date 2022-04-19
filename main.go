@@ -30,5 +30,22 @@ func main() {
 		})
 	})
 
+	r.GET("/hello/:name", func(c *ginFizz.Context) {
+		if param, err := c.Param("name"); err != nil {
+			c.String(http.StatusBadRequest, "no param %s, err %v", param, err)
+		} else {
+			c.String(http.StatusOK, "hello %s, you're at %s\n", param, c.Path)
+		}
+
+	})
+
+	r.GET("/assets/*filepath", func(c *ginFizz.Context) {
+		if param, err := c.Param("filepath"); err != nil {
+			c.String(http.StatusBadRequest, "no param %s, err %v", param, err)
+		} else {
+			c.JSON(http.StatusOK, &ginFizz.H{"filepath": param})
+		}
+	})
+
 	r.Run(":9999")
 }

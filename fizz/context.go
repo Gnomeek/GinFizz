@@ -13,6 +13,7 @@ type Context struct {
 	Request      *http.Request
 	StatusCode   int
 	Path, Method string
+	Params       map[string]string
 }
 
 func NewContext(w http.ResponseWriter, req *http.Request) *Context {
@@ -32,6 +33,14 @@ func (c *Context) SetHeader(key, value string) {
 func (c *Context) Status(code int) {
 	c.StatusCode = code
 	c.Writer.WriteHeader(code)
+}
+
+func (c *Context) Param(key string) (string, error) {
+	value, err := c.Params[key]
+	if !err {
+		return "", fmt.Errorf("get param %s failed", key)
+	}
+	return value, nil
 }
 
 func (c *Context) Query(key string) string {

@@ -87,3 +87,8 @@ func (c *Context) HTML(code int, html string) {
 	c.SetHeader("Content-Type", "text/html")
 	c.Data(code, []byte(html))
 }
+
+func (c *Context) Fail(code int, err string) {
+	c.idx = len(c.handlers)
+	c.JSON(code, &H{"message": err})
+}

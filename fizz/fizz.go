@@ -2,6 +2,7 @@ package fizz
 
 import (
 	"net/http"
+	"strings"
 )
 
 // HandlerFunc is customized based on http.HandlerFunc
@@ -47,7 +48,14 @@ func (engine *Engine) POST(path string, handler HandlerFunc) {
 // ServeHTTP is implemented from http.Handler interface
 // so that engine can be used in http.ListenAndServe
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	middlewares := make([]HandlerFunc, 0)
+	for _, group := range engine.routerGroups {
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			middlewares = append(middlewares, group.middlewares...)
+		}
+	}
 	context := NewContext(w, req)
+	context.handlers = middlewares
 	engine.router.handle(context)
 }
 
@@ -79,4 +87,9 @@ func (group *RouterGroup) GET(pattern string, handler HandlerFunc) {
 // POST defines the method to add POST request
 func (group *RouterGroup) POST(pattern string, handler HandlerFunc) {
 	group.addRoute("POST", pattern, handler)
+}
+
+// Use is defined to add middleware to the group
+func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
+	group.middlewares = append(group.middlewares, middlewares...)
 }

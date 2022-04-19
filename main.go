@@ -22,6 +22,10 @@ func main() {
 	r.GET("/", func(c *ginFizz.Context) {
 		c.HTML(http.StatusOK, "<h1>Hello</h1>")
 	})
+	r.GET("/panic", func(c *ginFizz.Context) {
+		names := []string{"ginfizz"}
+		c.String(http.StatusOK, names[100])
+	})
 	r.GET("/string", func(c *ginFizz.Context) {
 		c.String(http.StatusOK, "URL.Path = %q\n", c.Path)
 	})
